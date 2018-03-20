@@ -1,6 +1,6 @@
 # Experiments in UDP Multicasting
 
-I have long been fascinated by broadcast networks. In the biological context, broadcast networks (and eavesdropping) are a central feature of anuran and insect choruses.
+This package implements a UDP multicast node discovery mechanism.
 
 In TCP/IP there is a similar mechanism provided for in the UDP broadcast and multicast. This package wraps Golang's UDP functions in the `net` package.
 
@@ -19,30 +19,36 @@ This package comes with some small command line utilities in the `examples` dir.
 In a terminal window, run the following from the root of this repository.
 
 ```bash
-$ go run examples/pinger/main.go
-# => Broadcasting to 239.0.0.0:9999
+$ go run example/main.go
+# Listening on 239.0.0.0:9999
+# '301223baa544' joined the cluster
+# map[301223baa544:0xc420056140]
+# map[301223baa544:0xc420056180]
+# map[301223baa544:0xc42009a080]
+# map[301223baa544:0xc42009a0c0]
+# map[301223baa544:0xc42009a100]
+# '56785de23293' joined the cluster
+# map[301223baa544:0xc42009a100 56785de23293:0xc42009a140]
+# map[301223baa544:0xc42009a180 56785de23293:0xc42009a140]
+# map[301223baa544:0xc42009a180 56785de23293:0xc42009a1c0]
+# map[301223baa544:0xc420056200 56785de23293:0xc42009a1c0]
+# map[301223baa544:0xc420056200 56785de23293:0xc42009a200]
+# map[301223baa544:0xc42009a240 56785de23293:0xc42009a200]
+# 2018/03/20 15:13:05 	 	 	56785de23293 left the cluster
+# map[301223baa544:0xc42009a340]
 ```
 
 In a separate terminal window, run the following, also from the root of this repository.
 
 ```bash
-$ go run examples/listener/main.go
-# => Listening on 239.0.0.0:9999
-# 2017/04/12 12:53:24 13 bytes read from 192.168.1.129:51335
-# 2017/04/12 12:53:24 00000000  68 65 6c 6c 6f 2c 20 77  6f 72 6c 640a           |hello, world.|
-#
-# 2017/04/12 12:53:25 13 bytes read from 192.168.1.129:51335
-# 2017/04/12 12:53:25 00000000  68 65 6c 6c 6f 2c 20 77  6f 72 6c 64 0a           |hello, world.|
+$ go run example/main.go
+# Listening on 239.0.0.0:9999
+# '56785de23293' joined the cluster
+# map[56785de23293:0xc420092100]
+# '301223baa544' joined the cluster
+# map[301223baa544:0xc4200560c0 56785de23293:0xc420092100]
+# map[56785de23293:0xc420092140 301223baa544:0xc4200560c0]
+
 ```
 
-You may run as many instances of `listeners` or `pingers` as you would like. Concurrency is handled by the router (or switch).
-
-## References
-
-The code in this repository is derived from [a Gist](https://gist.github.com/fiorix/9664255) created by [Andre Fiori](https://gist.github.com/fiorix)
-
-* https://www.quora.com/What-is-the-difference-between-broadcasting-and-multicasting
-* https://groups.google.com/forum/#!msg/golang-nuts/nbmYWwHCgPc/ZBw2uH6Bdi4J
-* https://en.wikipedia.org/wiki/Multicast_address
-* http://www.tldp.org/HOWTO/Multicast-HOWTO-2.html
-* https://support.mcommstv.com/hc/en-us/articles/202306226-Choosing-multicast-addresses-and-ports
+Both nodes know the existence of one another.
