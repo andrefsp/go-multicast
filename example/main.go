@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	nodeDiscovery := gomulticast.NewNodeDiscovery("")
+	nodeDiscovery := gomulticast.NewNodeDiscovery("example-cluster", "")
 	go nodeDiscovery.Start()
 
 	for range time.NewTicker(5 * time.Second).C {

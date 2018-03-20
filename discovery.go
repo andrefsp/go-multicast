@@ -20,23 +20,27 @@ type Discovery interface {
 }
 
 // Constructor
-func NewNodeDiscovery(multicastAddress string) Discovery {
+func NewNodeDiscovery(clusterName, multicastAddress string) Discovery {
 	if multicastAddress == "" {
 		multicastAddress = defaultMulticastAddress
 	}
 	return &NodeDiscovery{
+		clusterName:      clusterName,
 		multicastAddress: multicastAddress,
 	}
 }
 
 // Discovery message
 type DiscoverMessage struct {
-	Message  string `json:"message"`
-	Hostname string `json:"hostname"`
+	ClusterName string `json:"cluster_name"`
+	Message     string `json:"message"`
+	Hostname    string `json:"hostname"`
 }
 
 // NodeDiscovery implements Discover interface
 type NodeDiscovery struct {
+	clusterName string
+
 	// multicast address
 	multicastAddress string
 
@@ -97,11 +101,13 @@ func (d *NodeDiscovery) msgHandler(src *net.UDPAddr, n int, b []byte) {
 		return
 	}
 
-	d.addOrUpdateNode(&Node{
-		Hostname:      message.Hostname,
-		IP:            strings.Split(src.String(), ":")[0],
-		LastHeartbeat: time.Now(),
-	})
+	if message.ClusterName == d.ClusterName {
+		d.addOrUpdateNode(&Node{
+			Hostname:      message.Hostname,
+			IP:            strings.Split(src.String(), ":")[0],
+			LastHeartbeat: time.Now(),
+		})
+	}
 }
 
 func (d *NodeDiscovery) startPing() {
@@ -118,8 +124,9 @@ func (d *NodeDiscovery) startPing() {
 		}
 
 		data, err := json.Marshal(DiscoverMessage{
-			Message:  "Hello world",
-			Hostname: hostname,
+			ClusterName: d.clusterName,
+			Message:     "Hello world",
+			Hostname:    hostname,
 		})
 		if err != nil {
 			log.Println(err)
