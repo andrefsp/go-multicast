@@ -101,7 +101,7 @@ func (d *NodeDiscovery) msgHandler(src *net.UDPAddr, n int, b []byte) {
 		return
 	}
 
-	if message.ClusterName == d.ClusterName {
+	if message.ClusterName == d.clusterName {
 		d.addOrUpdateNode(&Node{
 			Hostname:      message.Hostname,
 			IP:            strings.Split(src.String(), ":")[0],
@@ -146,7 +146,4 @@ func (d *NodeDiscovery) Start() {
 
 	// Keep checking which nodes left the cluster
 	go d.checkNodes()
-
-	// Block here
-	<-make(chan bool)
 }
