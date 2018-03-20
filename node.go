@@ -7,3 +7,11 @@ type Node struct {
 	IP            string
 	LastHeartbeat time.Time
 }
+
+func (n Node) GetHostname() string {
+	return n.Hostname
+}
+
+func (n Node) GetIP() string {
+	return n.IP
+}
