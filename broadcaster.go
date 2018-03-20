@@ -1,4 +1,4 @@
-package multicast
+package gomulticast
 
 import "net"
 
