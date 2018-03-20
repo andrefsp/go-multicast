@@ -1,22 +1,24 @@
 package main
 
-import gomulticast "github.com/dmichael/go-multicast"
+import (
+	"fmt"
+	"time"
+
+	gomulticast "github.com/andrefsp/go-multicast"
+)
 
 func main() {
 
-	go func() {
-		gomulticast.StartPinger()
-	}()
+	nodeDiscovery := gomulticast.NewNodeDiscovery("")
+	go nodeDiscovery.Start()
 
-	go func() {
-		gomulticast.StartListener()
-	}()
+	for range time.NewTicker(5 * time.Second).C {
+		fmt.Println("Current nodes in the cluster::: ")
 
-	go func() {
-		gomulticast.CheckNodes()
-	}()
+		for _, node := range nodeDiscovery.GetNodes() {
+			fmt.Printf("\t \t %+v \n", node)
+		}
 
-	complete := make(chan bool)
-
-	<-complete
+	}
+	<-make(chan struct{})
 }
